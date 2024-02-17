@@ -5,12 +5,15 @@
 #include <SPI.h>
 #include <SD.h>
 #include <Adafruit_Sensor.h>
-#define pin A5
+#include <SparkFun_SGP30_Arduino_Library.h>
+#include <Wire.h>
+#define pin A3
 #define DHTPIN 2
 #define out 7
 #define DHTTYPE DHT11
 MQ135 mq135_sensor(pin);
 DHT dht(DHTPIN, DHTTYPE);
+SGP30 sgp;
 float Ro = 4.78;
 
 double co2, co, nh4;
@@ -118,9 +121,11 @@ void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  Wire.begin();
   pinMode(out, OUTPUT);
   // Ro = 4.78;
   dht.begin();
+  sgp.initAirQuality();
 }
 
 void loop()
@@ -128,14 +133,16 @@ void loop()
   // put your main code here, to run repeatedly:
   temperature = dht.readTemperature();
   humidity = dht.readHumidity();
+  sgp.measureAirQuality();
   if (isnan(humidity) || isnan(temperature))
   {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
-  co2 = readCO2();
+  co2 = sgp.CO2;
   co = readCO();
   nh4 = readNH4();
+  double tvoc = sgp.TVOC;
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
   double AQI = max(Coaqi, NH4aqi);
@@ -156,11 +163,14 @@ void loop()
     dataFile.print("\t");
     dataFile.print(nh4);
     dataFile.print("\t");
+    dataFile.print(tvoc);
+    dataFile.print("\t");
     dataFile.print(AQI);
     dataFile.print("\t");
     dataFile.print(temperature);
     dataFile.print("\t");
-    dataFile.println(humidity);
+    dataFile.print(humidity);
+    dataFile.println();
     dataFile.close();
   }
   Serial.print(co2);
@@ -171,8 +181,8 @@ void loop()
   // Serial.print(",");
   Serial.print(nh4);
   Serial.print(",");
-  // Serial.print(NH4aqi);
-  // Serial.print(",");
+  Serial.print(tvoc);
+  Serial.print(",");
   Serial.print(AQI);
   Serial.print(",");
   Serial.print(humidity);
