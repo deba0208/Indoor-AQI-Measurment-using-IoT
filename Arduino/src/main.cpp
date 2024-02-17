@@ -139,6 +139,7 @@ void loop()
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
   double AQI = max(Coaqi, NH4aqi);
+  File dataFile = SD.open("room1.txt", FILE_WRITE);
   if (AQI > 200)
   {
     digitalWrite(out, HIGH);
@@ -146,6 +147,21 @@ void loop()
   else
   {
     digitalWrite(out, LOW);
+  }
+  if (dataFile)
+  {
+    dataFile.print(co2);
+    dataFile.print("\t");
+    dataFile.print(co);
+    dataFile.print("\t");
+    dataFile.print(nh4);
+    dataFile.print("\t");
+    dataFile.print(AQI);
+    dataFile.print("\t");
+    dataFile.print(temperature);
+    dataFile.print("\t");
+    dataFile.println(humidity);
+    dataFile.close();
   }
   Serial.print(co2);
   Serial.print(",");
