@@ -2,6 +2,8 @@
 #include <math.h>
 #include <MQ135.h>
 #include <DHT.h>
+#include <SPI.h>
+#include <SD.h>
 #include <Adafruit_Sensor.h>
 #define pin A5
 #define DHTPIN 2
