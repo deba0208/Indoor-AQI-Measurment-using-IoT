@@ -8,6 +8,7 @@
 #include <SparkFun_SGP30_Arduino_Library.h>
 #include <Wire.h>
 #define pin A3
+#define dust A0
 #define DHTPIN 2
 #define out 7
 #define DHTTYPE DHT11
@@ -16,8 +17,8 @@ DHT dht(DHTPIN, DHTTYPE);
 SGP30 sgp;
 float Ro = 4.78;
 
-double co2, co, nh4;
-float temperature, humidity;
+double co2, co, nh4, pm25;
+float temperature, humidity, voltage, calVoltage, dustDensity;
 
 double Resistance(int raw)
 {
@@ -50,12 +51,12 @@ double GetPercentage(double *pcurve)
   double ppm = pow(10.0, ((log(ratio) - pcurve[0]) / pcurve[1]));
   return ppm;
 }
-
-double readCO2()
+double readPM25()
 {
-  double CO2curve[2] = {1.58, -0.3};
-  return mq135_sensor.getCorrectedPPM(temperature, humidity);
-  // return GetPercentage(CO2curve);
+  voltage = analogRead(dust);
+  calVoltage = voltage * (5.0 / 1024);
+  dustDensity = 0.17 * calVoltage - 0.1;
+  return dustDensity;
 }
 double readCO()
 {
@@ -117,15 +118,55 @@ double aqiNH4()
   double ppm = ((Ih - Il) / (BPh - BPl)) * (Cp - BPl) + (Il);
   return ppm;
 }
+double aqiPM25()
+{
+  double aqi[6][4] = {{0, 30.0, 0, 50.0},
+                      {31.0, 60.0, 51.0, 100.0},
+                      {61.0, 90.0, 101.0, 200.0},
+                      {91.0, 120.0, 201.0, 300},
+                      {121.1, 250.0, 301.0, 400.0},
+                      {251, 1e9, 401.0, 500}};
+  int ind;
+  double BPh, BPl, Ih, Il;
+  double Cp = pm25;
+  for (int i = 0; i < 6; i++)
+  {
+    if (Cp >= aqi[i][0] && Cp <= aqi[i][1])
+    {
+      BPh = aqi[i][1];
+      BPl = aqi[i][0];
+      Ih = aqi[i][3];
+      Il = aqi[i][2];
+      break;
+    }
+  }
+  double ppm = ((Ih - Il) / (BPh - BPl)) * (Cp - BPl) + (Il);
+  return ppm;
+}
+
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(9600);
   Wire.begin();
+  // SD.begin();
   pinMode(out, OUTPUT);
   // Ro = 4.78;
   dht.begin();
+  if (sgp.begin() == false)
+  {
+    // Serial.println("No SGP30 Detected. Check connections.");
+    while (1)
+      ;
+  }
+  if (!SD.begin())
+  {
+    // Serial.println("No SD Detected. Check connections.");
+    while (1)
+      ;
+  }
   sgp.initAirQuality();
+  // Serial.print("ok");
 }
 
 void loop()
@@ -136,15 +177,17 @@ void loop()
   sgp.measureAirQuality();
   if (isnan(humidity) || isnan(temperature))
   {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    return;
+    // Serial.println(F("Failed to read from DHT sensor!"));
+    // return;
   }
   co2 = sgp.CO2;
   co = readCO();
   nh4 = readNH4();
+  // pm25 = readPM25();
   double tvoc = sgp.TVOC;
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
+  // double PM25aqi = aqiPM25();
   double AQI = max(Coaqi, NH4aqi);
   File dataFile = SD.open("room1.txt", FILE_WRITE);
   if (AQI > 200)
@@ -161,6 +204,8 @@ void loop()
     dataFile.print("\t");
     dataFile.print(co);
     dataFile.print("\t");
+    // dataFile.print(pm25);
+    // dataFile.print("\t");
     dataFile.print(nh4);
     dataFile.print("\t");
     dataFile.print(tvoc);
@@ -172,22 +217,22 @@ void loop()
     dataFile.print(humidity);
     dataFile.println();
     dataFile.close();
+    // Serial.print(co2);
+    // Serial.print(",");
+    // Serial.print(co);
+    // Serial.print(",");
+    // // Serial.print(pm25);
+    // // Serial.print(",");
+    // Serial.print(nh4);
+    // Serial.print(",");
+    // Serial.print(tvoc);
+    // Serial.print(",");
+    // Serial.print(AQI);
+    // Serial.print(",");
+    // Serial.print(humidity);
+    // Serial.print(",");
+    // Serial.print(temperature);
+    // Serial.println(" ");
   }
-  Serial.print(co2);
-  Serial.print(",");
-  Serial.print(co);
-  Serial.print(",");
-  // Serial.print(Coaqi);
-  // Serial.print(",");
-  Serial.print(nh4);
-  Serial.print(",");
-  Serial.print(tvoc);
-  Serial.print(",");
-  Serial.print(AQI);
-  Serial.print(",");
-  Serial.print(humidity);
-  Serial.print(",");
-  Serial.print(temperature);
-  Serial.println(" ");
-  delay(1500);
+  delay(500000);
 }
