@@ -3,10 +3,11 @@
 #include <MQ135.h>
 #include <DHT.h>
 #include <SPI.h>
-#include <SD.h>
 #include <Adafruit_Sensor.h>
 #include <SparkFun_SGP30_Arduino_Library.h>
 #include <Wire.h>
+#include <./components/sdcard.h>
+#include <./components/pm25.h>
 #define pin A3
 #define dust A0
 #define DHTPIN 2
@@ -16,9 +17,11 @@ MQ135 mq135_sensor(pin);
 DHT dht(DHTPIN, DHTTYPE);
 SGP30 sgp;
 float Ro = 4.78;
-
-double co2, co, nh4, pm25;
-float temperature, humidity, voltage, calVoltage, dustDensity;
+int PIN = 10;
+int entryId = 0;
+double co2, co, nh4, pm25, tvoc, AQI;
+float temperature, humidity;
+unsigned long prev, interval = 1000;
 
 double Resistance(int raw)
 {
@@ -51,13 +54,7 @@ double GetPercentage(double *pcurve)
   double ppm = pow(10.0, ((log(ratio) - pcurve[0]) / pcurve[1]));
   return ppm;
 }
-double readPM25()
-{
-  voltage = analogRead(dust);
-  calVoltage = voltage * (5.0 / 1024);
-  dustDensity = 0.17 * calVoltage - 0.1;
-  return dustDensity;
-}
+
 double readCO()
 {
   double COcurve[2] = {1.6, -0.25};
@@ -143,7 +140,20 @@ double aqiPM25()
   double ppm = ((Ih - Il) / (BPh - BPl)) * (Cp - BPl) + (Il);
   return ppm;
 }
-
+String createLogEntry()
+{
+  String logEntry;
+  entryId++;
+  logEntry = String(entryId) + ": " + co2 + "\t" + co + "\t" + nh4 + "\t" + pm25 + "\t" + tvoc + "\t" + AQI + "\t" + humidity + "\t" + temperature;
+  return logEntry;
+}
+String createLogEntry(boolean flag)
+{
+  String logEntry;
+  entryId++;
+  logEntry = String(co2) + "," + co + "," + nh4 + "," + pm25 + "," + tvoc + "," + AQI + "," + humidity + "," + temperature;
+  return logEntry;
+}
 void setup()
 {
   // put your setup code here, to run once:
@@ -153,19 +163,23 @@ void setup()
   pinMode(out, OUTPUT);
   // Ro = 4.78;
   dht.begin();
+
   if (sgp.begin() == false)
   {
     // Serial.println("No SGP30 Detected. Check connections.");
     while (1)
       ;
   }
-  if (!SD.begin())
-  {
-    // Serial.println("No SD Detected. Check connections.");
-    while (1)
-      ;
-  }
+  // if (!SD.begin())
+  // {
+  //   // Serial.println("No SD Detected. Check connections.");
+  //   while (1)
+  //     ;
+  // }
+  // initializeSD(PIN);
   sgp.initAirQuality();
+
+  delay(1000);
   // Serial.print("ok");
 }
 
@@ -183,56 +197,38 @@ void loop()
   co2 = sgp.CO2;
   co = readCO();
   nh4 = readNH4();
-  // pm25 = readPM25();
-  double tvoc = sgp.TVOC;
+  pm25 = readPm25();
+  tvoc = sgp.TVOC;
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
-  // double PM25aqi = aqiPM25();
-  double AQI = max(Coaqi, NH4aqi);
-  File dataFile = SD.open("room1.txt", FILE_WRITE);
-  if (AQI > 200)
-  {
-    digitalWrite(out, HIGH);
-  }
-  else
-  {
-    digitalWrite(out, LOW);
-  }
-  if (dataFile)
-  {
-    dataFile.print(co2);
-    dataFile.print("\t");
-    dataFile.print(co);
-    dataFile.print("\t");
-    // dataFile.print(pm25);
-    // dataFile.print("\t");
-    dataFile.print(nh4);
-    dataFile.print("\t");
-    dataFile.print(tvoc);
-    dataFile.print("\t");
-    dataFile.print(AQI);
-    dataFile.print("\t");
-    dataFile.print(temperature);
-    dataFile.print("\t");
-    dataFile.print(humidity);
-    dataFile.println();
-    dataFile.close();
-    // Serial.print(co2);
-    // Serial.print(",");
-    // Serial.print(co);
-    // Serial.print(",");
-    // // Serial.print(pm25);
-    // // Serial.print(",");
-    // Serial.print(nh4);
-    // Serial.print(",");
-    // Serial.print(tvoc);
-    // Serial.print(",");
-    // Serial.print(AQI);
-    // Serial.print(",");
-    // Serial.print(humidity);
-    // Serial.print(",");
-    // Serial.print(temperature);
-    // Serial.println(" ");
-  }
-  delay(500000);
+  double PM25aqi = aqiPM25();
+  AQI = max(Coaqi, max(NH4aqi, PM25aqi));
+  String logEntry;
+  unsigned int now = millis();
+  // if ((Serial.available()))
+  // {
+  //   logEntry = createLogEntry();
+  //   writeEntryToFile(logEntry);
+  //   prev = now;
+  // }
+  logEntry = createLogEntry(true);
+  Serial.println(logEntry);
+  // Serial.print(co2);
+  // Serial.print(",");
+  // Serial.print(co);
+  // Serial.print(",");
+  // // Serial.print(pm25);
+  // // Serial.print(",");
+  // Serial.print(nh4);
+  // Serial.print(",");
+  // Serial.print(tvoc);
+  // Serial.print(",");
+  // Serial.print(AQI);
+  // Serial.print(",");
+  // Serial.print(humidity);
+  // Serial.print(",");
+  // Serial.print(temperature);
+  // Serial.println(" ");
+
+  delay(900000);
 }
