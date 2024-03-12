@@ -115,31 +115,31 @@ double aqiNH4()
   double ppm = ((Ih - Il) / (BPh - BPl)) * (Cp - BPl) + (Il);
   return ppm;
 }
-double aqiPM25()
-{
-  double aqi[6][4] = {{0, 30.0, 0, 50.0},
-                      {31.0, 60.0, 51.0, 100.0},
-                      {61.0, 90.0, 101.0, 200.0},
-                      {91.0, 120.0, 201.0, 300},
-                      {121.1, 250.0, 301.0, 400.0},
-                      {251, 1e9, 401.0, 500}};
-  int ind;
-  double BPh, BPl, Ih, Il;
-  double Cp = pm25;
-  for (int i = 0; i < 6; i++)
-  {
-    if (Cp >= aqi[i][0] && Cp <= aqi[i][1])
-    {
-      BPh = aqi[i][1];
-      BPl = aqi[i][0];
-      Ih = aqi[i][3];
-      Il = aqi[i][2];
-      break;
-    }
-  }
-  double ppm = ((Ih - Il) / (BPh - BPl)) * (Cp - BPl) + (Il);
-  return ppm;
-}
+// double aqiPM25()
+// {
+//   double aqi[6][4] = {{0, 30.0, 0, 50.0},
+//                       {31.0, 60.0, 51.0, 100.0},
+//                       {61.0, 90.0, 101.0, 200.0},
+//                       {91.0, 120.0, 201.0, 300},
+//                       {121.1, 250.0, 301.0, 400.0},
+//                       {251, 1e9, 401.0, 500}};
+//   int ind;
+//   double BPh, BPl, Ih, Il;
+//   double Cp = pm25;
+//   for (int i = 0; i < 6; i++)
+//   {
+//     if (Cp >= aqi[i][0] && Cp <= aqi[i][1])
+//     {
+//       BPh = aqi[i][1];
+//       BPl = aqi[i][0];
+//       Ih = aqi[i][3];
+//       Il = aqi[i][2];
+//       break;
+//     }
+//   }
+//   double ppm = ((Ih - Il) / (BPh - BPl)) * (Cp - BPl) + (Il);
+//   return ppm;
+// }
 String createLogEntry()
 {
   String logEntry;
@@ -201,7 +201,7 @@ void loop()
   tvoc = sgp.TVOC;
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
-  double PM25aqi = aqiPM25();
+  double PM25aqi = aqiPM25(pm25);
   AQI = max(Coaqi, max(NH4aqi, PM25aqi));
   String logEntry;
   unsigned int now = millis();
