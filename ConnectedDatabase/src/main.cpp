@@ -3,15 +3,15 @@
 #include <ThingSpeak.h>
 // put function declarations here:
 
-#define CHANNEL_ID 2349866
-#define CHANNEL_API_KEY "9TCHOR19YOX9WNMD"
+#define CHANNEL_ID 2453979
+#define CHANNEL_API_KEY "RP5FVEQOR3M265OX"
 
 #define LED_BUILTIN 15
 #define Rxp2 16
 #define Txp2 17
 
-#define WIFI_NETWORK "Debashis"
-#define WIFI_PASSWORD "debashis02"
+#define WIFI_NETWORK "ANIRBAN's iPhone"
+#define WIFI_PASSWORD "Anirban@2000"
 #define WIFI_TIMEOUT_MS 20000
 
 // ardunio values
@@ -28,22 +28,23 @@ void connectToWiFi()
 
   while (WiFi.status() != WL_CONNECTED && millis() - startAttempttime < WIFI_TIMEOUT_MS)
   {
-    // Serial.print(".");
+    Serial.print(".");
     delay(100);
   }
 
   if (WiFi.status() != WL_CONNECTED)
   {
-    // Serial.println("Failed!");
+    Serial.println("Failed!");
     digitalWrite(LED_BUILTIN, HIGH);
     delay(1500);
     digitalWrite(LED_BUILTIN, LOW);
+    return;
   }
-  // else
-  // {
-  //   Serial.print("connected!");
-  //   Serial.println(WiFi.localIP());
-  // }
+  else
+  {
+    Serial.print("connected!");
+    Serial.println(WiFi.localIP());
+  }
 }
 
 void getvalue(String Str)
@@ -102,6 +103,6 @@ void loop()
   ThingSpeak.writeFields(CHANNEL_ID, CHANNEL_API_KEY);
   Serial.println(s);
 
-  delay(15005);
+  delay(15000);
 }
 // put function definitions here:

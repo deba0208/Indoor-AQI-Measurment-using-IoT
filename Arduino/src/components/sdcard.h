@@ -12,6 +12,7 @@ void initializeSD(int pin)
     }
     else
     {
+        Serial.println("no");
         return;
     }
 }
