@@ -3,7 +3,8 @@
 // put function declarations here:
 #include <WiFi.h>
 #include <HTTPClient.h>
-
+#define Rxp2 16
+#define Txp2 17
 const char *ssid = "Debashis";
 const char *password = "debashis02";
 const char *serverUrl = "http://192.168.0.114:3000/data";
@@ -49,6 +50,8 @@ void setup()
 void loop()
 {
   // Get the current date/time (example)
+  String s = Serial2.readString();
+  getvalue(s);
   String dateTime = "2024-03-31T12:00:00";
 
   // Send the data to the Node.js server
@@ -66,6 +69,21 @@ void loop()
   // String payload = "{\" dateTime\":\"" + dateTime + "\"}";
   int httpResponseCode = http.POST(payload);
   Serial.print(co2);
+  Serial.print(",");
+  Serial.print(co);
+  Serial.print(",");
+  Serial.print(pm25);     
+  Serial.print(",");
+  Serial.print(nh4);
+  Serial.print(",");
+  Serial.print(tvoc);
+  Serial.print(",");
+  Serial.print(AQI);
+  Serial.print(",");
+  Serial.print(Humidity);
+  Serial.print(",");
+  Serial.print(Temp);
+  Serial.println(" ");
   if (httpResponseCode > 0)
   {
     Serial.print("HTTP Response code: ");
@@ -79,5 +97,5 @@ void loop()
 
   http.end();
 
-  delay(6000); // Send data every minute
+  delay(10000); // Send data every minute
 }

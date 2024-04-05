@@ -13,6 +13,8 @@ float readPm25()
     voMeasure = analogRead(measuringpin);
     calcVoltage = voMeasure * (5.0 / 1024.0);
     dustDensity = 170 * calcVoltage - 0.1;
+    if (dustDensity < 0)
+        return 0;
     return dustDensity;
 }
 

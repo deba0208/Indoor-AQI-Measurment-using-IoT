@@ -217,7 +217,7 @@ void loop()
   Serial.print(",");
   Serial.print(co);
   Serial.print(",");
-  Serial.print(pm25);
+  Serial.print(pm25);     
   Serial.print(",");
   Serial.print(nh4);
   Serial.print(",");
@@ -230,5 +230,5 @@ void loop()
   Serial.print(temperature);
   Serial.println(" ");
 
-  delay(6000);
+  delay(10000);
 }
