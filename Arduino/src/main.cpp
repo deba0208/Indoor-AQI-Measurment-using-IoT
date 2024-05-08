@@ -212,23 +212,23 @@ void loop()
   //   prev = now;
   // }
   logEntry = createLogEntry(true);
-  Serial.println(logEntry);
-  // Serial.print(co2);
-  // Serial.print(",");
-  // Serial.print(co);
-  // Serial.print(",");
-  // // Serial.print(pm25);
-  // // Serial.print(",");
-  // Serial.print(nh4);
-  // Serial.print(",");
-  // Serial.print(tvoc);
-  // Serial.print(",");
-  // Serial.print(AQI);
-  // Serial.print(",");
-  // Serial.print(humidity);
-  // Serial.print(",");
-  // Serial.print(temperature);
-  // Serial.println(" ");
+  // Serial.println(logEntry);
+  Serial.print(co2);
+  Serial.print(",");
+  Serial.print(co);
+  Serial.print(",");
+  Serial.print(pm25);     
+  Serial.print(",");
+  Serial.print(nh4);
+  Serial.print(",");
+  Serial.print(tvoc);
+  Serial.print(",");
+  Serial.print(AQI);
+  Serial.print(",");
+  Serial.print(humidity);
+  Serial.print(",");
+  Serial.print(temperature);
+  Serial.println(" ");
 
-  delay(15000);
+  delay(10000);
 }
