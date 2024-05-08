@@ -1,10 +1,36 @@
 // server.js
+//EyVc7dHpN9gtrzxa
+//mongodb+srv://dasbabai2017:<password>@allcomponantvalue.226u6wj.mongodb.net/
+
+
+
+
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const { title } = require("process");
 const app = express();
 const PORT = 3000;
+
+
+// Ata dotenv file diye password er username neba ho66e
+const dotenv = require('dotenv');
+dotenv.config();
+const password = process.env.MONGO_PASSWORD;
+const username = process.env.MONGO_USERNAME;
+
+
+
+// connecting to the mongo server
+mongoose.connect("mongodb+srv://username:password@allcomponantvalue.226u6wj.mongodb.net/",).then((result) => {
+
+  console.log("db connect");
+}).catch((err) => {
+  console.log(err);
+});
+
+
 
 app.use(bodyParser.json());
 app.get("/data", (req, res) => {
@@ -37,3 +63,7 @@ app.post("/data", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
