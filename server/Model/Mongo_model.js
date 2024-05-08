@@ -18,6 +18,12 @@ const componentSchema = new mongoose.Schema({
         require: true
     },
 
+    nh4: {
+        type: Number,
+        require: true
+    },
+
+
     AQI: {
         type: Number,
         require: true
@@ -40,7 +46,7 @@ const componentSchema = new mongoose.Schema({
 
 });
 
-const componentModel = mongoose.model("Products", componentSchema );
+const componentModel = mongoose.model("ComponentData", componentSchema);
 
 
 module.exports = componentModel; 
