@@ -25,10 +25,10 @@ const authentication = (req, res, next) => {
   const auHeader = req.headers.Authentication;
   if (auHeader) {
     const token = auHeader.split(" ")[1];
-    if (token === 123456789) {
+    if (token === "123456789") {
       next();
     } else {
-      res.status(403).json({ message: "forbidden" });
+      res.json({ message: "forbidden" });
     }
   }
 }
@@ -44,6 +44,7 @@ const component = (body) => {
     Temperature: Number(comp[6]),
     Humidity: Number(comp[7]),
   }
+  return newComps;
 }
 // connecting to the mongo server
 mongoose.connect(`mongodb+srv://${username}:${password}@allcomponantvalue.226u6wj.mongodb.net/`, {
@@ -58,7 +59,7 @@ mongoose.connect(`mongodb+srv://${username}:${password}@allcomponantvalue.226u6w
 
 
 
-app.use(bodyParser.json());
+
 app.get("/data", (req, res) => {
   fs.readFile("data.json", "utf-8", (err, data) => {
     if (err) throw err;
@@ -85,12 +86,21 @@ app.get("/data", (req, res) => {
 //   // }
 //   // Process the data as needed
 // });
-app.post("/data", authentication, async (req, res) => {
-  const values = component(req.body);
-  const newComp = new componentModel({ co2, co, nh4, pm25, TVOC, AQI, Temperature, Humidity });
+// app.post("/data", async (req, res) => {
+//   const values = component(req.body);
+//   const newComp = new componentModel({ co2, co, nh4, pm25, TVOC, AQI, Temperature, Humidity });
+//   await newComp.save();
+//   res.json({ message: "successfully added" });
+// })
+app.post("/data", async (req, res) => {
+  const val = (req.body);
+  const { co2, co, nh4, pm25, TVOC, AQI, Temperature, Humidity } = req.body; // Destructure the properties from req.body
+  console.log(req.body);
+  // const newComp = await componentModel.create({ co2, co, nh4, pm25, TVOC, AQI, Temperature, Humidity });
+  const newComp = new componentModel(val);
   await newComp.save();
   res.json({ message: "successfully added" });
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

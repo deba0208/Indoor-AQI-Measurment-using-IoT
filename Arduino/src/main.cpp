@@ -16,6 +16,7 @@
 MQ135 mq135_sensor(pin);
 DHT dht(DHTPIN, DHTTYPE);
 SGP30 sgp;
+double time = 0;
 float Ro = 4.78;
 int PIN = 10;
 int entryId = 0;
@@ -194,15 +195,15 @@ void loop()
     // Serial.println(F("Failed to read from DHT sensor!"));
     // return;
   }
-  co2 = sgp.CO2;
-  co = readCO();
-  nh4 = readNH4();
-  pm25 = readPm25();
-  tvoc = sgp.TVOC;
+  co2 += sgp.CO2;
+  co += readCO();
+  nh4 += readNH4();
+  pm25 += readPm25();
+  tvoc += sgp.TVOC;
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
   double PM25aqi = aqiPM25(pm25);
-  AQI = max(Coaqi, max(NH4aqi, PM25aqi));
+  AQI += max(Coaqi, max(NH4aqi, PM25aqi));
   String logEntry;
   unsigned int now = millis();
   // if ((Serial.available()))
@@ -212,23 +213,27 @@ void loop()
   //   prev = now;
   // }
   logEntry = createLogEntry(true);
+  delay(1000);
+  time += 1000;
   // Serial.println(logEntry);
-  Serial.print(co2);
-  Serial.print(",");
-  Serial.print(co);
-  Serial.print(",");
-  Serial.print(pm25);     
-  Serial.print(",");
-  Serial.print(nh4);
-  Serial.print(",");
-  Serial.print(tvoc);
-  Serial.print(",");
-  Serial.print(AQI);
-  Serial.print(",");
-  Serial.print(humidity);
-  Serial.print(",");
-  Serial.print(temperature);
-  Serial.println(" ");
-
+  if (time == 900000)
+  {
+    Serial.print(co2 / 900);
+    Serial.print(",");
+    Serial.print(co / 900);
+    Serial.print(",");
+    Serial.print(pm25 / 900);
+    Serial.print(",");
+    Serial.print(nh4 / 900);
+    Serial.print(",");
+    Serial.print(tvoc / 900);
+    Serial.print(",");
+    Serial.print(AQI / 900);
+    Serial.print(",");
+    Serial.print(humidity);
+    Serial.print(",");
+    Serial.print(temperature);
+    Serial.println(" ");
+  }
   delay(10000);
 }
