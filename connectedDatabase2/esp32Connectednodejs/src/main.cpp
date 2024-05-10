@@ -1,13 +1,14 @@
 #include <Arduino.h>
-
+#include "time.h"
 // put function declarations here:
 #include <WiFi.h>
 #include <HTTPClient.h>
-#define Rxp2 16
+#define Rxp2 3
 #define Txp2 17
+
 const char *ssid = "Debashis";
 const char *password = "debashis02";
-const char *serverUrl = "http://192.168.0.114:3000/data";
+const char *serverUrl = "https://deba0208-server.onrender.com/data";
 float co2, co, tvoc, nh4, pm25, AQI, Temp, Humidity;
 char delimiter = ',';
 void getvalue(String Str)
@@ -50,7 +51,7 @@ void setup()
 void loop()
 {
   // Get the current date/time (example)
-  String s = Serial2.readString();
+  String s = Serial.readString();
   getvalue(s);
   String dateTime = "2024-03-31T12:00:00";
 
@@ -65,14 +66,14 @@ void loop()
   // Make sure to replace "your_access_token" with your actual authorization token
 
   // Formulate the JSON payload
-  String payload = "{\"co2\": \"" + String(co2) + "\", \"co\": \"" + String(co) + "\", \"pm2.5\": \"" + String(pm25) + "\", \"nh4\": \"" + String(nh4) + "\", \"AQI\": \"" + String(AQI) + "\", \"TVOC\": \"" + String(tvoc) + "\", \"Temperature\": \"" + String(Temp) + "\", \"Humidity\": \"" + String(Humidity) + "\"}";
+  String payload = "{\"co2\": \"" + String(co2) + "\", \"co\": \"" + String(co) + "\", \"pm25\": \"" + String(pm25) + "\", \"nh4\": \"" + String(nh4) + "\", \"AQI\": \"" + String(AQI) + "\", \"TVOC\": \"" + String(tvoc) + "\", \"Temperature\": \"" + String(Temp) + "\", \"Humidity\": \"" + String(Humidity) + "\"}";
   // String payload = "{\" dateTime\":\"" + dateTime + "\"}";
   int httpResponseCode = http.POST(payload);
   Serial.print(co2);
   Serial.print(",");
   Serial.print(co);
   Serial.print(",");
-  Serial.print(pm25);     
+  Serial.print(pm25);
   Serial.print(",");
   Serial.print(nh4);
   Serial.print(",");
@@ -97,5 +98,5 @@ void loop()
 
   http.end();
 
-  delay(10000); // Send data every minute
+  delay(60000); // Send data every minute
 }
