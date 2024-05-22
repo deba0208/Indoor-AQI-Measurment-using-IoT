@@ -203,7 +203,7 @@ void loop()
   double Coaqi = aqiCO();
   double NH4aqi = aqiNH4();
   double PM25aqi = aqiPM25(pm25);
-  AQI = max(Coaqi, max(NH4aqi, PM25aqi));
+  AQI = min(Coaqi, min(NH4aqi, PM25aqi));
   String logEntry;
   unsigned int now = millis();
   // if ((Serial.available()))

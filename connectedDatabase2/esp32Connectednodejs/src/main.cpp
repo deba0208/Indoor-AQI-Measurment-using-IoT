@@ -9,9 +9,6 @@
 const char *ssid = "Debashis";
 const char *password = "debashis02";
 const char *serverUrl = "https://deba0208-server.onrender.com/data";
-<<<<<<< HEAD
-
-=======
 float co2, co, tvoc, nh4, pm25, AQI, Temp, Humidity;
 char delimiter = ',';
 void getvalue(String Str)
@@ -37,7 +34,6 @@ void getvalue(String Str)
   Humidity = array[6];
   Temp = array[7];
 }
->>>>>>> 53af275bdecf0ba555dd78737bc4e3a2e4d9ece5
 void setup()
 {
   Serial.begin(9600);
@@ -102,5 +98,5 @@ void loop()
 
   http.end();
 
-  delay(1000); // Send data every minute
+  delay(60000); // Send data every minute
 }

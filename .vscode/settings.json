@@ -1,7 +1,6 @@
 {
-    "cSpell.words": [
-        "diye",
-        "neba",
-        "TVOC"
-    ]
+  "cSpell.words": ["diye", "neba", "TVOC"],
+  "files.associations": {
+    "limits": "cpp"
+  }
 }
