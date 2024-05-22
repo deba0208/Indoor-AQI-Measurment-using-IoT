@@ -1,12 +1,13 @@
 #include <Arduino.h>
 
 // put function declarations here:
-#include <WiFi.h>
-#include <HTTPClient.h>
+// #include <WiFi.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 
-const char *ssid = "Debashis";
-const char *password = "debashis02";
-const char *serverUrl = "https://deba0208-server.onrender.com/data";
+const char *ssid = "Redmi Note 9 Pro Max";
+const char *password = "rimpa741302";
+const char *serverUrl = "http://192.168.7.238:3000/data";
 
 void setup()
 {
@@ -28,32 +29,26 @@ void loop()
   String dateTime = "2024-03-31T12:00:00";
 
   // Send the data to the Node.js server
+  WiFiClient client;
   HTTPClient http;
-  http.begin(serverUrl);
-
-  // Add custom headers
+//  HTTPClient http;
+  http.begin(client, serverUrl);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("Authorization", "Bearer 123456789");
 
-  // Make sure to replace "your_access_token" with your actual authorization token
+  String data = "{\"key\": \"value\"}"; // Replace with your data
+  int httpResponseCode = http.POST(data);
 
-  // Formulate the JSON payload
-  String payload = "{\"dateTime\": \"" + dateTime + "\"}";
-
-  int httpResponseCode = http.POST(payload);
-
-  if (httpResponseCode > 0)
-  {
+  if (httpResponseCode > 0) {
     Serial.print("HTTP Response code: ");
     Serial.println(httpResponseCode);
-  }
-  else
-  {
+    String response = http.getString();
+    Serial.println(response);
+  } else {
     Serial.print("Error code: ");
     Serial.println(httpResponseCode);
   }
 
   http.end();
 
-  delay(1000); // Send data every minute
+  delay(6000); // Send data every minute
 }
