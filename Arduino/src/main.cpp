@@ -16,6 +16,7 @@
 MQ135 mq135_sensor(pin);
 DHT dht(DHTPIN, DHTTYPE);
 SGP30 sgp;
+double time = 0;
 float Ro = 4.78;
 int PIN = 10;
 int entryId = 0;
@@ -212,23 +213,27 @@ void loop()
   //   prev = now;
   // }
   logEntry = createLogEntry(true);
-  Serial.println(logEntry);
-  // Serial.print(co2);
-  // Serial.print(",");
-  // Serial.print(co);
-  // Serial.print(",");
-  // // Serial.print(pm25);
-  // // Serial.print(",");
-  // Serial.print(nh4);
-  // Serial.print(",");
-  // Serial.print(tvoc);
-  // Serial.print(",");
-  // Serial.print(AQI);
-  // Serial.print(",");
-  // Serial.print(humidity);
-  // Serial.print(",");
-  // Serial.print(temperature);
-  // Serial.println(" ");
 
-  delay(15000);
+  // Serial.println(logEntry);
+
+  {
+    Serial.print(co2);
+    Serial.print(",");
+    Serial.print(co);
+    Serial.print(",");
+    Serial.print(pm25);
+    Serial.print(",");
+    Serial.print(nh4);
+    Serial.print(",");
+    Serial.print(tvoc);
+    Serial.print(",");
+    Serial.print(AQI);
+    Serial.print(",");
+    Serial.print(humidity);
+    Serial.print(",");
+    Serial.print(temperature);
+    Serial.print(",");
+    Serial.println(" ");
+  }
+  delay(60000);
 }

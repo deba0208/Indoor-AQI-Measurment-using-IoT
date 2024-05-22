@@ -1,32 +1,28 @@
 // server.js
+//EyVc7dHpN9gtrzxa
+//mongodb+srv://dasbabai2017:<password>@allcomponantvalue.226u6wj.mongodb.net/
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
 const mongoose = require("mongoose")
 const { title } = require("process");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const { componentModel } = require("./Model/Mongo_model");
 const app = express();
+app.use(cors());
+app.use(express.json());
 const PORT = 3000;
 
-app.use(express.json());
-app.use(cors());
-
-const authentication = (req, res, next) => {
-  let auHeader = req.headers.split(" ")[1];
-  if (auHeader === "123456789") {
-    next();
-  } else {
-    res.json({ message: "authentication failed" });
-  }
-}
-
+app.use(bodyParser.json());
 app.get("/data", (req, res) => {
   fs.readFile("data.json", "utf-8", (err, data) => {
     if (err) throw err;
     res.json(JSON.parse(data));
   });
 });
-app.post("/data", authentication, (req, res) => {
+app.post("/data", (req, res) => {
   const creatNewEntry = {
     id: Math.floor(Math.random() * 1000000),
     date: req.body.dateTime,
@@ -37,7 +33,7 @@ app.post("/data", authentication, (req, res) => {
     entry.push(creatNewEntry);
     fs.writeFile("data.json", JSON.stringify(entry), (err) => {
       if (err) throw err;
-      res.send(creatNewEntry);
+      res.status(201).send(creatNewEntry);
     });
   });
   // Process the data as needed
@@ -46,3 +42,7 @@ app.post("/data", authentication, (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
