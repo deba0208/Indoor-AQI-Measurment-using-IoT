@@ -180,7 +180,7 @@ void setup()
   // initializeSD(PIN);
   sgp.initAirQuality();
 
-  delay(1000);
+  delay(180000);
   // Serial.print("ok");
 }
 
