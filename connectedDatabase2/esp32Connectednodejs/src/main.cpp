@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "time.h"
+#include <Adafruit_I2CDevice.h>
+ #include <SPI.h>
 // put function declarations here:
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -46,6 +48,7 @@ void setup()
   }
 
   Serial.println("Connected to WiFi");
+  delay(180000);
 }
 
 void loop()
